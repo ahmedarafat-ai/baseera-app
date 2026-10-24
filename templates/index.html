@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بصيرة | تطوير أحمد عرفات - منصة القرآن والتدبر الذكي</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f5132">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- الهيدر العلوي -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="brand-box">
+                <div class="logo">🌿 بصيرة</div>
+                <span class="dev-badge">تطوير: م. أحمد عرفات</span>
+            </div>
+
+            <div class="nav-links-desktop">
+                <button class="tab-btn active" onclick="switchTab('quran-tab', this)">📖 المصحف (114 سورة)</button>
+                <button class="tab-btn" onclick="switchTab('quiz-tab', this)">🧠 اختبارات الفهم</button>
+                <button class="tab-btn" onclick="switchTab('ai-tab', this)">🤖 المساعد الذكي</button>
+                <button class="tab-btn" onclick="switchTab('bookmarks-tab', this)">🔖 المحفوظات</button>
+            </div>
+
+            <div class="user-stats">
+                <span class="score-pill">⭐ <strong id="user-score">0</strong></span>
+                <button class="download-app-btn" onclick="openInstallModal()">📲 تحميل التطبيق</button>
+                <button id="auth-btn" class="auth-btn" onclick="openAuthModal()">👤 دخول / حساب جديد</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- شريط استكمال القراءة وتقدم المستخدم -->
+    <div class="container">
+        <div id="continue-reading-bar" class="continue-bar">
+            <div class="continue-info">
+                <span id="welcome-user-text">👋 أهلاً بك في منصة بصيرة!</span>
+                <p>📌 آخر ما كنت تقرأه: <strong id="last-read-label">سورة الفاتحة - الآية 1</strong></p>
+            </div>
+            <button class="btn-continue" onclick="resumeLastReading()">▶️ استكمال القراءة من حيث توقفت</button>
+        </div>
+    </div>
+
+    <main class="container main-layout">
+
+        <!-- التبويب الأول: المصحف والتفسير -->
+        <section id="quran-tab" class="tab-section active">
+            <div class="quran-grid">
+                <aside class="surah-sidebar">
+                    <div class="sidebar-header">
+                        <h3>فهرس السور (114)</h3>
+                        <input type="text" id="surah-search" placeholder="ابحث عن اسم السورة...">
+                    </div>
+                    <div id="surah-list" class="surah-list">
+                        <div class="loader">جاري تحميل فهرس المصحف...</div>
+                    </div>
+                </aside>
+
+                <div class="ayah-viewer">
+                    <div class="surah-banner">
+                        <div>
+                            <h2 id="current-surah-name">سورة الفاتحة</h2>
+                            <p id="current-surah-meta">مكية • 7 آيات</p>
+                        </div>
+                        <div class="banner-actions">
+                            <button class="btn-action" onclick="startQuizFromCurrentSurah()">📝 اختبرني في هذه السورة</button>
+                        </div>
+                    </div>
+
+                    <div class="ayah-search-bar">
+                        <input type="text" id="ayah-filter" placeholder="ابحث عن كلمة أو معنى داخل آيات وتفسير هذه السورة...">
+                    </div>
+
+                    <div id="ayahs-container" class="ayahs-list">
+                        <div class="loader">جاري تحميل الآيات والتفسير الميسر...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- التبويب الثاني: الاختبارات -->
+        <section id="quiz-tab" class="tab-section">
+            <div class="quiz-wrapper">
+                <div class="quiz-header-box">
+                    <h2>🧠 مركز الاختبارات الذكي</h2>
+                    <p>اختر أي سورة ليقوم النظام بتوليد أسئلة فهم وتفسير تفاعلية منها فوراً</p>
+                    <div class="quiz-controls">
+                        <select id="quiz-surah-select"></select>
+                        <button class="btn-primary" onclick="loadDynamicQuiz()">توليد اختبار جديد 🔄</button>
+                    </div>
+                </div>
+                <div id="quiz-questions-container" class="quiz-questions-list"></div>
+            </div>
+        </section>
+
+        <!-- التبويب الثالث: المساعد الذكي -->
+        <section id="ai-tab" class="tab-section">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>🤖 المساعد القرآني الذكي (AI Tadabbur Assistant)</h3>
+                    <p>اسأل عن أي شعور تمر به (قلق، رزق، صبر، توبة، مذاكرة) أو ابحث في القرآن</p>
+                </div>
+                <div id="chat-messages" class="chat-messages">
+                    <div class="msg bot-msg">
+                        السلام عليكم ورحمة الله 🌿 أنا مساعدك الذكي في منصة <strong>بصيرة</strong>.<br>
+                        اكتب ما تشعر به أو الموضوع الذي تبحث عنه وسأرشدك للآيات والتفسير المناسب.
+                    </div>
+                </div>
+                <div class="quick-prompts">
+                    <button onclick="sendQuickPrompt('أشعر بالضيق والقلق من المستقبل')">🌱 أشعر بالقلق</button>
+                    <button onclick="sendQuickPrompt('آيات ونصائح عن الرزق والعمل')">💰 مفاتيح الرزق</button>
+                    <button onclick="sendQuickPrompt('أريد التوبة والرجوع إلى الله')">🤲 التوبة والمغفرة</button>
+                    <button onclick="sendQuickPrompt('آيات تشجع على العلم والمذاكرة')">📚 طلب العلم</button>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button class="btn-primary" onclick="sendMessage()">إرسال 🚀</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- التبويب الرابع: المحفوظات -->
+        <section id="bookmarks-tab" class="tab-section">
+            <div class="bookmarks-wrapper">
+                <h2>🔖 الآيات والتدبرات المحفوظة في حسابك</h2>
+                <div id="bookmarks-container" class="ayahs-list" style="margin-top: 20px;"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- الفوتر باسمك -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>منصة <strong>بصيرة</strong> للتدبر والقرآن الكريم | جميع الحقوق محفوظة © 2026</p>
+            <p class="author-credit">تم التصميم والتطوير بواسطة: <span>المهندس أحمد عرفات (Ahmed Arafat)</span> 💻✨</p>
+        </div>
+    </footer>
+
+    <!-- نافذة تسجيل الدخول وإنشاء الحساب (Auth Modal) -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="auth-modal-title">👤 حسابي في بصيرة</h3>
+                <button onclick="closeAuthModal()" class="close-btn">✖</button>
+            </div>
+            <div id="logged-out-view">
+                <p class="modal-subtitle">سجّل حسابك ليتم حفظ السور والآيات التي توقفت عندها ونقاطك على أي جهاز</p>
+                <div class="auth-tabs">
+                    <button id="tab-login-btn" class="active" onclick="toggleAuthMode('login')">تسجيل الدخول</button>
+                    <button id="tab-reg-btn" onclick="toggleAuthMode('register')">إنشاء حساب جديد</button>
+                </div>
+                <div id="full-name-group" class="form-group" style="display: none;">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="auth-fullname" placeholder="مثال: أحمد عرفات">
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم (Username)</label>
+                    <input type="text" id="auth-username" placeholder="مثال: ahmed_arafat">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="auth-password" placeholder="********">
+                </div>
+                <p id="auth-error" class="error-msg"></p>
+                <button class="btn-primary full-width" onclick="submitAuth()">حفظ ودخول 🚀</button>
+            </div>
+
+            <div id="logged-in-view" style="display: none; text-align: center;">
+                <h4 id="profile-name" style="margin-bottom: 10px; color: #0f5132;"></h4>
+                <p style="margin-bottom: 16px;">✅ حسابك متصل ويتم حفظ آخر سورة وآية تقرأها تلقائياً.</p>
+                <button class="btn-danger full-width" onclick="logoutUser()">تسجيل الخروج</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تحميل وتثبيت التطبيق على اللابتوب والموبايل -->
+    <div id="install-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📲 تحميل تطبيق "بصيرة" (موبايل ولابتوب)</h3>
+                <button onclick="closeInstallModal()" class="close-btn">✖</button>
+            </div>
+            <div class="install-body">
+                <button id="direct-install-btn" class="btn-primary full-width" style="margin-bottom: 16px; background: #198754;">
+                    ⚡ تثبيت التطبيق مباشرة الآن بضغطة واحدة
+                </button>
+                <div class="install-steps">
+                    <div class="step-box">
+                        <strong>💻 على اللابتوب والكمبيوتر (Chrome / Edge):</strong>
+                        <p>اضغط على زر التثبيت باللون الأخضر أعلاه، أو اضغط على أيقونة الشاشة والسهم 📥 الموجودة في أقصى شريط عنوان المتصفح بالأعلى بجانب علامة النجمة.</p>
+                    </div>
+                    <div class="step-box">
+                        <strong>📱 على موبايل أندرويد (Android):</strong>
+                        <p>افتح القائمة (الثلاث نقاط ⋮ في أعلى المتصفح) ثم اختر <strong>"تثبيت التطبيق" (Install App)</strong> أو "الإضافة إلى الشاشة الرئيسية".</p>
+                    </div>
+                    <div class="step-box">
+                        <strong>🍏 على آيفون (iPhone - Safari):</strong>
+                        <p>اضغط على زر المشاركة (Share ⬆️) بالأسفل ثم اختر <strong>"إضافة إلى الشاشة الرئيسية" (Add to Home Screen)</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المشغل الصوتي -->
+    <div id="audio-player-bar" class="audio-bar" style="display: none;">
+        <span id="audio-title">تلاوة الآية</span>
+        <audio id="quran-audio" controls></audio>
+        <button onclick="closeAudio()" class="close-audio">✖</button>
+    </div>
+
+    <!-- شريط الموبايل السفلي -->
+    <nav class="mobile-bottom-nav">
+        <button class="mob-nav-btn active" onclick="switchTab('quran-tab', this)">📖 المصحف</button>
+        <button class="mob-nav-btn" onclick="switchTab('quiz-tab', this)">🧠 اختبارات</button>
+        <button class="mob-nav-btn" onclick="switchTab('ai-tab', this)">🤖 المساعد</button>
+        <button class="mob-nav-btn" onclick="switchTab('bookmarks-tab', this)">🔖 المحفوظات</button>
+    </nav>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
